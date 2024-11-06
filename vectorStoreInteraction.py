@@ -9,10 +9,9 @@ k = 3
 vectorDim = 4
 collectionName = ''
 
-url = 'https://071a9cd4-154f-4464-acfe-bb7a4ecb9770.us-east4-0.gcp.cloud.qdrant.io:6333/collections'
-headers = {"Authorization": "Bearer " + str(api_key),
-           "Content-Type": "application/json"
-}
+url = 'https://071a9cd4-154f-4464-acfe-bb7a4ecb9770.us-east4-0.gcp.cloud.qdrant.io:6333'
+headers = {"Authorization": "Bearer " + str(api_key)}
+
 payload = {
     "name": "collection_name",
     "vectors": {
@@ -21,7 +20,9 @@ payload = {
     }
 }
 
-response = requests.post(url, json=payload, headers=headers) # send POST request
+response = requests.get(url, headers=headers)
+
+# response = requests.post(url, json=payload, headers=headers) # send POST request
 
 if response.status_code == 200:
     print("Collection created successfully!")
