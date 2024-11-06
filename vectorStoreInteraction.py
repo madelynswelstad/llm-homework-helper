@@ -7,38 +7,40 @@ load_dotenv()
 api_key = os.getenv('QDRANT_API_KEY')
 k = 3
 vectorDim = 4
-collectionName = ''
 
 url = 'https://071a9cd4-154f-4464-acfe-bb7a4ecb9770.us-east4-0.gcp.cloud.qdrant.io:6333'
-headers = {"Authorization": "Bearer " + str(api_key)}
+headers = {"Authorization": "Bearer " + str(api_key),
+           "Content-Type": "application/json"
+}
 
 
 def checkConnectionToStore():
     response = requests.get(url, headers=headers)
 
+    # print result
     if response.status_code == 200:
         print("Connection successful!\n", response.json())
     else:
         print("Failed to connect:", response.status_code, '\n', response.text)
 
-def addData():
+def createCollection(collectionName):
     payload = {
-        "name": "collection_name",
+        "name": collectionName,
         "vectors": {
-            "size": vectorDim,
-            "distance": "cosine"
+            "config": {
+                "size": 4,
+                "distance": "Cosine"
+            }
         }
     }
 
-    response = requests.get(url, headers=headers)
+    response = requests.put(url+'/collections/'+collectionName, json=payload, headers=headers)
 
+    # print result
     if response.status_code == 200:
-        print("Connection successful!\n", response.json())
+        print("Creation of collection successful!\n", response.json())
     else:
-        print("Failed to connect:", response.status_code, '\n', response.text)
+        print("Failed to create collection:", response.status_code, '\n', response.text)
 
-# response = requests.post(url, json=payload, headers=headers) # send POST request
-
-# def getKNearestNeighbors(vectorizedQuery):
-
-checkConnectionToStore()
+# checkConnectionToStore()
+createCollection('testCollection')
