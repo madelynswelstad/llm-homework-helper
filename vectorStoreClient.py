@@ -21,6 +21,7 @@ client.create_collection(
     vectors_config=VectorParams(size=vector_size, distance=distance_metric),
 )
 
+# same as embeddings.py, but does one at a time
 def get_embedding(text):
     response = openai.Embedding.create(
         input=text,
