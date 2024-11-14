@@ -8,7 +8,7 @@ app.config['UPLOAD_FOLDER'] = 'uploads/'  # Directory where uploaded files are s
 # Ensure the upload folder exists
 os.makedirs(app.config['UPLOAD_FOLDER'], exist_ok=True)
 
-@app.route('/') # define a route to the homepage (ie the root url)
+@app.route('/', methods=['get', 'post']) # define a route to the homepage (ie the root url)
 def home():
     query = None  # initialize query variable
     if request.method == 'POST':  # check if the request method is POST
