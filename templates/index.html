@@ -7,6 +7,38 @@
 </head>
 <body>
     <h1>Welcome to Madelyn's Freaking Web Application!</h1>
-    <p>She is so cool.</p>
+    <p>Marco is cool.</p>
+
+    <h1>Enter a Query</h1>
+    <form method="POST" action="/">
+        <input type="text" name="query" placeholder="Type your query here">
+        <button type="submit">Submit</button>
+    </form>
+    {% if query %}
+        <p>You entered: {{ query }}</p>
+    {% endif %}
 </body>
 </html>
+
+<!-- 
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Query Page</title>
+</head>
+<body>
+    <h1>Enter a Query</h1>
+    <form method="POST" action="/">
+        <input type="text" name="query" placeholder="Type your query here">
+        <button type="submit">Submit</button>
+    </form>
+    {% if query %}
+        <p>You entered: {{ query }}</p>
+    {% endif %}
+</body>
+</html>
+
+-->
