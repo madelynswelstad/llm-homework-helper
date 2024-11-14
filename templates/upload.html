@@ -1,0 +1,45 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Upload PDF</title>
+    <style>
+        .upload-area {
+            border: 2px dashed #ddd;
+            padding: 20px;
+            text-align: center;
+            margin: 20px;
+        }
+    </style>
+</head>
+<body>
+    <h1>Upload Your PDF File</h1>
+    <form action="/upload" method="post" enctype="multipart/form-data">
+        <div class="upload-area" id="upload-area">
+            <p>Drag & Drop your PDF here or</p>
+            <input type="file" name="file" accept=".pdf">
+            <button type="submit">Upload</button>
+        </div>
+    </form>
+
+    <script>
+        const uploadArea = document.getElementById('upload-area');
+        uploadArea.addEventListener('dragover', (event) => {
+            event.preventDefault();
+            uploadArea.style.borderColor = '#000';
+        });
+
+        uploadArea.addEventListener('dragleave', () => {
+            uploadArea.style.borderColor = '#ddd';
+        });
+
+        uploadArea.addEventListener('drop', (event) => {
+            event.preventDefault();
+            const fileInput = document.querySelector('input[type="file"]');
+            fileInput.files = event.dataTransfer.files;
+            document.querySelector('form').submit();
+        });
+    </script>
+</body>
+</html>
