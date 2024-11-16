@@ -11,8 +11,8 @@ os.makedirs(app.config['UPLOAD_FOLDER'], exist_ok=True)
 # Dictionary to store class titles as keys and lists of file paths as values
 class_files = {}
 
-from flask import Flask, render_template, request, redirect, url_for, send_from_directory
-import os
+# List to store all queries
+queries = []
 
 # create a flask application instance
 app = Flask(__name__)
@@ -24,12 +24,13 @@ os.makedirs(app.config['UPLOAD_FOLDER'], exist_ok=True)
 # Dictionary to store class titles as keys and lists of file paths as values
 class_files = {}
 
-@app.route('/') # define a route to the homepage (ie the root url)
+@app.route('/', methods=['GET', 'POST']) # define a route to the homepage (ie the root url)
 def home():
-    query = None  # initialize query variable
-    if request.method == 'POST':  # check if the request method is POST
-        query = request.form.get('query')  # retrieve the 'query' from the form data
-    return render_template('index.html', query=query)  # pass the query to the template
+    if request.method == 'POST':  # If the request method is POST, handle the query
+        query = request.form.get('query')  # Retrieve the 'query' from the form data
+        if query:  # Check if the query is not empty
+            queries.append(query)  # Add the query to the list of queries
+    return render_template('index.html', queries=queries)  # Pass all queries to the template
 
 @app.route('/upload', methods=['GET', 'POST'])  # define a route for the upload page
 def upload():

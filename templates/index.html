@@ -17,8 +17,15 @@
         <input type="text" name="query" placeholder="Grant says to add your query">
         <button type="submit">Submit</button>
     </form>
-    {% if query %}
-        <p>You entered: {{ query }}</p>
+    {% if queries and queries|length > 0 %}
+        <h2>Previous Queries</h2>
+        <ul>
+            {% for q in queries %}
+                <li>{{ q }}</li>
+            {% endfor %}
+        </ul>
+    {% else %}
+        <p>No queries yet. Start by entering one above!</p>
     {% endif %}
 </body>
 </html>
