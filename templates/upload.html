@@ -11,21 +11,55 @@
             text-align: center;
             margin: 20px;
         }
+        .file-entry, .class-section {
+            margin: 10px 0;
+        }
+        .class-section h3 {
+            margin-bottom: 5px;
+        }
+        .remove-button {
+            margin-left: 10px;
+            color: red;
+        }
     </style>
 </head>
 <body>
     <h1>Upload Your PDF File</h1>
 
-    <!-- New Button to Navigate to the Upload Page -->
+    <!-- Button to return to the homepage -->
     <button onclick="window.location.href='/'">Make a Query</button>
 
+    <!-- File Upload Form -->
     <form action="/upload" method="post" enctype="multipart/form-data">
         <div class="upload-area" id="upload-area">
             <p>Drag & Drop your PDF here or</p>
-            <input type="file" name="file" accept=".pdf">
+            <input type="file" name="file" accept=".pdf" required>
+            <p>Class code must be of format ABCD123 (i.e. CSCI400, DSCI570, etc.)</p>
+            <input type="text" name="class_title" placeholder="Enter Class Code" required>
             <button type="submit">Upload</button>
         </div>
     </form>
+
+    <!-- Display Dictionary -->
+    <h2>Class Files</h2>
+    <div>
+        {% for class_title, files in class_files.items() %}
+            <div class="class-section">
+                <h3>{{ class_title }}</h3>
+                <ul>
+                    {% for file in files %}
+                        <li>
+                            <a href="/uploads/{{ file }}" target="_blank">{{ file }}</a>
+                            <!-- Add a Remove button -->
+                            <form action="/delete/{{ class_title }}/{{ file }}" method="post" style="display:inline;">
+                                <button type="submit" class="remove-button">Remove</button>
+                            </form>
+                        </li>
+                    {% endfor %}
+                </ul>
+            </div>
+        {% endfor %}
+    </div>
 
     <script>
         const uploadArea = document.getElementById('upload-area');
@@ -42,7 +76,6 @@
             event.preventDefault();
             const fileInput = document.querySelector('input[type="file"]');
             fileInput.files = event.dataTransfer.files;
-            document.querySelector('form').submit();
         });
     </script>
 </body>
