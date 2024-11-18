@@ -26,15 +26,16 @@
 <body>
     <h1>Upload Your PDF File</h1>
 
-    <script>
+    <!-- <script>
         window.onload = function() {
             // Safely pass error message to JavaScript using JSON
-            var errorMessage = {{ error_message|tojson }};
-            if (errorMessage) {
+            var errorMessage = {{ error_message|tojson|default("null") }};
+            if (errorMessage !== null) {
                 alert(errorMessage);  // Show error message if it exists
             }
         };
-    </script>
+    </script> -->
+    
 
     <!-- Button to return to the homepage -->
     <button onclick="window.location.href='/'">Make a Query</button>

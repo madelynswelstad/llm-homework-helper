@@ -60,7 +60,4 @@ if __name__ == "__main__":
         {"id": 2, "text": "Another training example."},
     ]
 
-    insert_documents(documents, collection_name_test)
-    similar_docs = retrieve_similar_documents("We can test functionality by modifying this query.")
-    print("Similar Documents:", similar_docs)
-
+    insert_do
