@@ -12,24 +12,25 @@ client = QdrantClient(
     api_key=os.getenv('QDRANT_API_KEY')
 )
 
-collection_name = 'llm_training_data'
+collection_name_test = 'llm_training_data'
 vector_size = 100
 distance_metric = Distance.COSINE
 
-client.create_collection(
-    collection_name=collection_name,
-    vectors_config=VectorParams(size=vector_size, distance=distance_metric),
-)
+def create_collection(collection_name):
+    client.create_collection(
+        collection_name=collection_name,
+        vectors_config=VectorParams(size=vector_size, distance=distance_metric),
+    )
 
 # same as embeddings.py, but does one at a time
 def get_embedding(text):
     response = openai.Embedding.create(
-        input=text,
+        input=text, # input must be pdf
         model="text-embedding-ada-002"
     )
     return response['data'][0]['embedding']
 
-def insert_documents(documents):
+def insert_documents(documents, collection_name):
     points = [
         PointStruct(
             id=doc['id'],
@@ -44,14 +45,7 @@ def insert_documents(documents):
         points=points
     )
 
-documents = [
-    {"id": 1, "text": "Sample text for training."},
-    {"id": 2, "text": "Another training example."},
-]
-
-insert_documents(documents)
-
-def retrieve_similar_documents(query_text, top_k=5):
+def retrieve_similar_documents(query_text, collection_name, top_k=5):
     query_vector = get_embedding(query_text)
     search_results = client.search(
         collection_name=collection_name,
@@ -60,6 +54,13 @@ def retrieve_similar_documents(query_text, top_k=5):
     )
     return [hit.payload['text'] for hit in search_results]
 
-similar_docs = retrieve_similar_documents("We can test functionality by modifying this query.")
-print("Similar Documents:", similar_docs)
+if __name__ == "__main__":
+    documents = [
+        {"id": 1, "text": "Sample text for training."},
+        {"id": 2, "text": "Another training example."},
+    ]
+
+    insert_documents(documents, collection_name_test)
+    similar_docs = retrieve_similar_documents("We can test functionality by modifying this query.")
+    print("Similar Documents:", similar_docs)
 

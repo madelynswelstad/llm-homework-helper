@@ -1,5 +1,7 @@
 from flask import Flask, render_template, request, redirect, url_for, send_from_directory
 import os
+import vectorStoreClient
+import pdf_to_text
 
 # create a flask application instance
 app = Flask(__name__)
@@ -30,12 +32,19 @@ def upload():
         # if the class title key does not exist in the dictionary, add it
         if class_title not in class_files:
             class_files[class_title] = []
+            vectorStoreClient.create_collection(class_title) # create new collection in vector store
         
         # Save the file if it has a PDF extension
         if file and file.filename.endswith('.pdf'):
             file_path = os.path.join(app.config['UPLOAD_FOLDER'], file.filename)
             file.save(file_path)
             class_files[class_title].append(file.filename)  # Add the file under the class title
+
+            # process the pdf then send to vector store
+            # embeddedText = vectorStoreClient.get_embedding(pdf_to_text.get_text(file))
+            # create chunks of equal size from embedding
+            # vectorStoreClient.insert_documents(chunked embeddings)
+
             return redirect(url_for('upload'))  # Redirect to the upload page after submission
         
         else:
@@ -51,7 +60,7 @@ def delete_file(class_title, filename):
     # Remove the file from the dictionary and delete it from disk
     if os.path.exists(file_path):
         os.remove(file_path)  # Delete the file from the uploads directory
-        
+
     if class_title in class_files and filename in class_files[class_title]:
         class_files[class_title].remove(filename)  # Remove the file reference from the dictionary
         # If the class has no files left, remove the class key

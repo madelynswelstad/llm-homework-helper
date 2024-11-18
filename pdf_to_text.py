@@ -15,10 +15,11 @@ def get_text(pdf_path):
             paragraphs.extend(paragraphs)
     return paragraphs
 
-# test run
-pdf_path = 'file_path.pdf'  # replace with your file path
-paragraphs = get_text(pdf_path)
+if __name__ == "__main__":
+    # test run
+    pdf_path = 'file_path.pdf'  # replace with your file path
+    paragraphs = get_text(pdf_path)
 
-# show data, manipulate it, whatever
-# for i, paragraph in enumerate(paragraphs, 1):
-#     print(f"Paragraph {i}:\n{paragraph}\n")
+    # show data, manipulate it, whatever
+    # for i, paragraph in enumerate(paragraphs, 1):
+    #     print(f"Paragraph {i}:\n{paragraph}\n")
