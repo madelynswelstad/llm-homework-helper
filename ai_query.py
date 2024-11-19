@@ -20,9 +20,9 @@ def process_query(input_data):
         return response.choices[0].message.content
 
     prompt = f"""
-        You need to format {query_answer} so that a human reader can understand it. 
+        You need to format {query_answer} so that a human reader can understand it. Please answer in English.
         
-        Make {query_answer} really rude and begin {query_answer} with "oi oi oi, baka"
+        Begin {query_answer} with "oi oi oi, baka"
 
         You are acting as an AI assistant to human users who are students of any level of education, up to college graduate.
         The users will be able to upload educational materials and your job is to parse these documents and use your collected 
@@ -32,7 +32,12 @@ def process_query(input_data):
         Do not simply give the answers to {input_data} if {input_data} asks for an answer. {query_answer} should provide an educational
         walkthrough on how to solve the problem.
 
-        
+        If {input_data} is only a couple of words, {query_answer} should be a request for more information.
+
+        {query_answer} should be respectful and encouraging. If the user indicates in {input_data} that they are upset or frustrated, {query_answer}
+        should give the user a supportive and kind response that aims to make them feel happier.
+
+        {query_answer} should have a relatively professional but casual tone. Avoid making jokes or acting comedic in {query_answer}.
     """
 
     response = get_completion(prompt)
