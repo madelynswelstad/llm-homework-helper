@@ -26,6 +26,16 @@ collection_name = 'llm_training_data'
 vector_size = 1536  # Matches OpenAI's text-embedding-ada-002
 distance_metric = Distance.COSINE
 
+def find_collections(collectionName):
+    collections_response = qdrant_client.get_collections()
+    # Extract the list of collection names
+    collection_names = [collection.name for collection in collections_response.collections]
+
+    if collectionName in collection_names:
+        print(f"Collection '{collectionName}' already exists.")
+    else:
+        create_collection(collectionName)
+
 def create_collection(collection_name):
     """Create a collection in Qdrant if it doesn't already exist."""
     if not qdrant_client.collection_exists(collection_name):
@@ -47,6 +57,7 @@ def get_embedding(text):
 
 def insert_documents(documents, collection_name):
     """Insert documents with embeddings into the Qdrant vector store."""
+    print(f'documents recieved: {documents}')
     points = [
         PointStruct(
             id=doc['id'],
@@ -92,7 +103,7 @@ def process_query(input_data):
 
     def get_completion(prompt, model="gpt-3.5-turbo"):
         messages = [{"role": "user", "content": prompt}]
-        response = openai.chat.completion.create(
+        response = openai_client.chat.completion.create(
             model=model,
             messages=messages
         )
@@ -182,7 +193,7 @@ def get_text_from_pdf(pdf_path, chunk_size=300):
 
 if __name__ == "__main__":
     # Path to the PDF file
-    pdf_path = "./data/finalpaper.pdf"
+    pdf_path = "./hw1.pdf"
 
     delete_collection(collection_name)
     print("after delete")

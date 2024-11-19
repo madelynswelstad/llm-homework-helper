@@ -1,11 +1,12 @@
 from flask import Flask, render_template, request, redirect, url_for, send_from_directory
 import os
-import vectorStoreClient
-import pdf_to_text
+import main
 
 # create a flask application instance
 app = Flask(__name__)
 app.config['UPLOAD_FOLDER'] = 'uploads/'  # Directory where uploaded files are saved
+
+collection_name = "llm-collection2.0"
 
 # Ensure the upload folder exists
 os.makedirs(app.config['UPLOAD_FOLDER'], exist_ok=True)
@@ -13,25 +14,16 @@ os.makedirs(app.config['UPLOAD_FOLDER'], exist_ok=True)
 # Dictionary to store class titles as keys and lists of file paths as values
 class_files = {}
 
-from flask import Flask, render_template, request, redirect, url_for, send_from_directory
-import os
-
-# create a flask application instance
-app = Flask(__name__)
-app.config['UPLOAD_FOLDER'] = 'uploads/'  # Directory where uploaded files are saved
-
-# Ensure the upload folder exists
-os.makedirs(app.config['UPLOAD_FOLDER'], exist_ok=True)
-
-# Dictionary to store class titles as keys and lists of file paths as values
-class_files = {}
-
-@app.route('/') # define a route to the homepage (ie the root url)
+# home method is called when user loads root url, reloads page, or submits a form or performs an action
+@app.route('/', methods=['GET', 'POST']) # define a route to the homepage (ie the root url) and call function below
 def home():
+    # check if collection already exists
+    main.find_collections(collection_name)
+
     query = None  # initialize query variable
-    if request.method == 'POST':  # check if the request method is POST
+    if request.method == 'POST':  # check if the request method is POST (when data like forms or actions are sent to the server)
         query = request.form.get('query')  # retrieve the 'query' from the form data
-    return render_template('index.html', query=query)  # pass the query to the template
+    return render_template('index.html', query=query)  # pass the query to the template to display
 
 @app.route('/upload', methods=['GET', 'POST'])  # define a route for the upload page
 def upload():
@@ -44,7 +36,6 @@ def upload():
         # if the class title key does not exist in the dictionary, add it
         if class_title not in class_files:
             class_files[class_title] = []
-            vectorStoreClient.create_collection(class_title) # create new collection in vector store
         
         # Save the file if it has a PDF extension
         if file and file.filename.endswith('.pdf'):
@@ -52,10 +43,12 @@ def upload():
             file.save(file_path)
             class_files[class_title].append(file.filename)  # Add the file under the class title
 
-            # process the pdf then send to vector store
-            # embeddedText = vectorStoreClient.get_embedding(pdf_to_text.get_text(file))
-            # create chunks of equal size from embedding
-            # vectorStoreClient.insert_documents(chunked embeddings)
+            # Process and prepare the documents
+            text_chunks = main.get_text_from_pdf(file_path)  # Get text as a list of strings
+            documents = [{"id": i, "text": chunk} for i, chunk in enumerate(text_chunks, start=1)]
+
+            # Insert documents into the collection
+            main.insert_documents(documents, collection_name)
 
             return redirect(url_for('upload'))  # Redirect to the upload page after submission
         
