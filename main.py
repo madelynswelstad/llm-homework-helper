@@ -147,6 +147,38 @@ def text_to_speech(text, filename="aianswer.mp3"):
     engine.runAndWait()
     return filename
 
+def split_into_chunks(text_list, chunk_size=300):
+    """Split text into chunks with a maximum token size."""
+    chunks = []
+    current_chunk = []
+    current_length = 0
+
+    for paragraph in text_list:
+        paragraph_length = len(paragraph.split())
+        if current_length + paragraph_length > chunk_size:
+            # Save the current chunk and reset
+            chunks.append(" ".join(current_chunk))
+            current_chunk = []
+            current_length = 0
+        current_chunk.append(paragraph)
+        current_length += paragraph_length
+
+    # Add the last chunk
+    if current_chunk:
+        chunks.append(" ".join(current_chunk))
+    
+    return chunks
+
+def get_text_from_pdf(pdf_path, chunk_size=300):
+    """Extract and split text from a PDF file."""
+    paragraphs = []
+    with fitz.open(pdf_path) as file:
+        for page in file:
+            text = page.get_text("text")
+            paragraphs.extend([p.strip() for p in text.split("\n") if p.strip()])
+    # Split paragraphs into chunks
+    return split_into_chunks(paragraphs, chunk_size)
+
 
 if __name__ == "__main__":
     # Path to the PDF file
@@ -156,12 +188,11 @@ if __name__ == "__main__":
     print("after delete")
 
     # Extract text from the PDF
-    paragraphs = get_text_from_pdf(pdf_path)
+    text_chunks = get_text_from_pdf(pdf_path)
     print("after paragraphs")
 
     # Prepare documents for insertion
-    documents = [{"id": i, "text": paragraph} for i, paragraph in enumerate(paragraphs, 1)]
-    print("after documents")
+    documents = [{"id": i, "text": paragraph} for i, paragraph in enumerate(text_chunks, 1)]
 
     # Create the Qdrant collection
     create_collection(collection_name)
@@ -182,3 +213,5 @@ if __name__ == "__main__":
     print("Top similar results:")
     for i, result in enumerate(results, 1):
         print(f"{i}: {result}")
+
+
