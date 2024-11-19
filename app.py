@@ -1,5 +1,7 @@
 from flask import Flask, render_template, request, redirect, url_for, send_from_directory
 import os
+import vectorStoreClient
+import pdf_to_text
 
 # create a flask application instance
 app = Flask(__name__)
@@ -11,8 +13,8 @@ os.makedirs(app.config['UPLOAD_FOLDER'], exist_ok=True)
 # Dictionary to store class titles as keys and lists of file paths as values
 class_files = {}
 
-# List to store all queries
-queries = []
+from flask import Flask, render_template, request, redirect, url_for, send_from_directory
+import os
 
 # create a flask application instance
 app = Flask(__name__)
@@ -24,29 +26,44 @@ os.makedirs(app.config['UPLOAD_FOLDER'], exist_ok=True)
 # Dictionary to store class titles as keys and lists of file paths as values
 class_files = {}
 
-@app.route('/', methods=['GET', 'POST']) # define a route to the homepage (ie the root url)
+@app.route('/') # define a route to the homepage (ie the root url)
 def home():
-    if request.method == 'POST':  # If the request method is POST, handle the query
-        query = request.form.get('query')  # Retrieve the 'query' from the form data
-        if query:  # Check if the query is not empty
-            queries.append(query)  # Add the query to the list of queries
-    return render_template('index.html', queries=queries)  # Pass all queries to the template
+    query = None  # initialize query variable
+    if request.method == 'POST':  # check if the request method is POST
+        query = request.form.get('query')  # retrieve the 'query' from the form data
+    return render_template('index.html', query=query)  # pass the query to the template
 
 @app.route('/upload', methods=['GET', 'POST'])  # define a route for the upload page
 def upload():
+    error_message = None  # Initialize the error message
+
     if request.method == 'POST':  # if the request method is POST, handle the file upload
         file = request.files.get('file')  # get the file from the request
         class_title = request.form.get('class_title', 'No Class Assigned')  # get the class title
-        # Ensure the class title key exists in the dictionary
+        
+        # if the class title key does not exist in the dictionary, add it
         if class_title not in class_files:
             class_files[class_title] = []
+            vectorStoreClient.create_collection(class_title) # create new collection in vector store
+        
         # Save the file if it has a PDF extension
         if file and file.filename.endswith('.pdf'):
             file_path = os.path.join(app.config['UPLOAD_FOLDER'], file.filename)
             file.save(file_path)
             class_files[class_title].append(file.filename)  # Add the file under the class title
+
+            # process the pdf then send to vector store
+            # embeddedText = vectorStoreClient.get_embedding(pdf_to_text.get_text(file))
+            # create chunks of equal size from embedding
+            # vectorStoreClient.insert_documents(chunked embeddings)
+
             return redirect(url_for('upload'))  # Redirect to the upload page after submission
-    return render_template('upload.html', class_files=class_files)
+        
+        else:
+            # Set the error message if the file is not a PDF
+            error_message = "Incorrect file type. Please upload a PDF."
+
+    return render_template('upload.html', class_files=class_files, error_message=error_message)
 
 @app.route('/delete/<class_title>/<filename>', methods=['POST'])  # define a route to handle file deletion
 def delete_file(class_title, filename):
@@ -55,6 +72,7 @@ def delete_file(class_title, filename):
     # Remove the file from the dictionary and delete it from disk
     if os.path.exists(file_path):
         os.remove(file_path)  # Delete the file from the uploads directory
+
     if class_title in class_files and filename in class_files[class_title]:
         class_files[class_title].remove(filename)  # Remove the file reference from the dictionary
         # If the class has no files left, remove the class key
@@ -67,4 +85,3 @@ def delete_file(class_title, filename):
 # accessible locally at: http://127.0.0.1:5000/
 if __name__ == '__main__':
     app.run(debug=True)
-    
