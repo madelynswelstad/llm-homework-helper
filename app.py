@@ -7,6 +7,7 @@ app = Flask(__name__)
 app.config['UPLOAD_FOLDER'] = 'uploads/'  # Directory where uploaded files are saved
 
 collection_name = "llm-collection2.0"
+currId = 0
 
 # Ensure the upload folder exists
 os.makedirs(app.config['UPLOAD_FOLDER'], exist_ok=True)
@@ -27,6 +28,7 @@ def home():
 
 @app.route('/upload', methods=['GET', 'POST'])  # define a route for the upload page
 def upload():
+    global currId
     error_message = None  # Initialize the error message
 
     if request.method == 'POST':  # if the request method is POST, handle the file upload
@@ -45,7 +47,8 @@ def upload():
 
             # Process and prepare the documents
             text_chunks = main.get_text_from_pdf(file_path)  # Get text as a list of strings
-            documents = [{"id": i, "text": chunk} for i, chunk in enumerate(text_chunks, start=1)]
+            documents = [{"id": i, "text": chunk} for i, chunk in enumerate(text_chunks, start=currId)]
+            currId += len(documents) 
 
             # Insert documents into the collection
             main.insert_documents(documents, collection_name)
