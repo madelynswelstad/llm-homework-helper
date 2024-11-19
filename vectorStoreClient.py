@@ -45,7 +45,7 @@ def insert_documents(documents, collection_name):
         points=points
     )
 
-def retrieve_similar_documents(query_text, collection_name, top_k=5):
+def retrieve_similar_documents(query_text, collection_name=collection_name_test, top_k=5):
     query_vector = get_embedding(query_text)
     search_results = client.search(
         collection_name=collection_name,
