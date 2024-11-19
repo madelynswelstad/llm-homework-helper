@@ -62,7 +62,7 @@ def insert_documents(documents, collection_name):
     )
     print(f"Inserted {len(documents)} documents into '{collection_name}'.")
 
-def retrieve_similar_documents(query_text, collection_name, top_k=5):
+def retrieve_similar_documents(query_text, collection_name=collection_name, top_k=5):
     """Retrieve similar documents from Qdrant."""
     query_vector = get_embedding(query_text)
     search_results = qdrant_client.search(
