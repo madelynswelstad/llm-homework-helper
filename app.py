@@ -76,7 +76,11 @@ def delete_file(class_title, filename):
             del class_files[class_title]
     return redirect(url_for('upload'))  # Redirect back to the upload page
 
-
+@app.route('/speech-to-text', methods=['GET'])
+def call_speech():
+    query = main.speech_to_text()
+    print(query)
+    return {"text": query}, 200
 # run the app when this file is executed directly
 # accessible locally at: http://127.0.0.1:5000/
 if __name__ == '__main__':

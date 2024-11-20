@@ -17,6 +17,11 @@
         <input type="text" name="query" placeholder="Grant says to add your query">
         <button type="submit">Submit</button>
     </form>
+
+    <h2>Speech to Text</h2>
+    <button id="sttButton">Start Listening</button>
+    <p id="sttResult">Your transcribed speech will appear here...</p>
+
     {% if queries and queries|length > 0 %}
         <h2>Previous Queries</h2>
         <ul>
@@ -27,5 +32,21 @@
     {% else %}
         <p>No queries yet. Start by entering one above!</p>
     {% endif %}
+
+    <script>
+        document.getElementById('sttButton').addEventListener('click', function() {
+            // Send request to the Flask server for speech-to-text
+            fetch('/speech-to-text')
+                .then(response => response.json())
+                .then(data => {
+                    document.getElementById('sttResult').innerText = 'You said: ' + data.text;
+                })
+                .catch(error => {
+                    console.error('Error:', error);
+                    document.getElementById('sttResult').innerText = 'Error occurred. Try again.';
+                });
+        });
+    </script>
+
 </body>
 </html>

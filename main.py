@@ -137,7 +137,6 @@ def process_query(input_data):
 def speech_to_text():
     """
     Requires installing
-        - PocketSphinx (pip install pocketsphinx)
         - pyaudio (pip install pyaudio)
     """
     r = sr.Recognizer()
@@ -147,10 +146,12 @@ def speech_to_text():
         audio = r.listen(source)
 
     try:
-        query = r.recognize_sphinx(audio)
+        query = r.recognize_google(audio)
         return query
-    except (sr.UnknownValueError, sr.RequestError):
-        return "NOOOOO IT FAILED to get the audio"
+    except (sr.UnknownValueError):
+        return "unknown value error"
+    except (sr.RequestError):
+        return "request error???"
 
 def text_to_speech(text, filename="aianswer.mp3"):
     engine = pyttsx3.init()
