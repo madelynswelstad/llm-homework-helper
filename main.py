@@ -77,6 +77,17 @@ def insert_documents(documents, collection_name):
 
 def retrieve_similar_documents(query_text, collection_name=collection_name, top_k=5):
     """Retrieve similar documents from Qdrant."""
+
+    print("Collection name: ", collection_name)
+
+    if not query_text:
+        print("Empty query text.")
+        return ["No query text provided."]
+    
+    if not qdrant_client.collection_exists(collection_name):
+        print(f"Collection '{collection_name}' does not exist.")
+        return ["Collection not found."]
+
     query_vector = get_embedding(query_text)
     search_results = qdrant_client.search(
         collection_name=collection_name,
@@ -206,7 +217,7 @@ def get_text_from_pdf(pdf_path, chunk_size=300):
 
 if __name__ == "__main__":
     # Path to the PDF file
-    pdf_path = "./hw1.pdf"
+    pdf_path = "uploads/WS7_300.pdf"
 
     delete_collection(collection_name)
     print("after delete")
