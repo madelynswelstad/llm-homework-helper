@@ -2,6 +2,7 @@ from flask import Flask, render_template, request, redirect, url_for, send_from_
 import os
 import main
 import openai
+from openai import OpenAI
 
 # create a flask application instance
 app = Flask(__name__)
@@ -10,8 +11,10 @@ app.config['UPLOAD_FOLDER'] = 'uploads/'  # Directory where uploaded files are s
 collection_name = "llm-collection2.0"
 currId = 0
 
-#OpenAI key
-openai.api_key = os.environ["OPENAI_API_KEY"]
+# Initialize OpenAI client
+openai_client = OpenAI(
+    api_key=os.environ['OPENAI_API_KEY']
+)
 
 # Ensure the upload folder exists
 os.makedirs(app.config['UPLOAD_FOLDER'], exist_ok=True)
@@ -32,14 +35,17 @@ def home():
         query = request.form.get('query')  # retrieve the 'query' from the form data
 
         if query:  # If a query is provided
+            print(query)
             # Send the query to ChatGPT
             try:
-                response = openai.chat.completion.create(
+                response = openai.chat.completions.create(
                     model="gpt-3.5-turbo",
                     messages=[{"role": "user", "content": "Your query here"}]
-                )["choices"][0]["message"]["content"]
+                ).choices[0].message.content
                 queries.append({"query": query, "response": response})  # Save query and response
+                print(response)
             except Exception as e:
+                print(e)
                 response = f"Error communicating with ChatGPT: {str(e)}"
 
     return render_template('index.html', query=query, response=response, queries=[q['query'] for q in queries])  # pass queries for display
