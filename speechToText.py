@@ -11,5 +11,5 @@ def handle_speech_to_text():
     Handle speech-to-text by listening to the microphone and processing the audio.
     Returns the transcribed text.
     """
-    query = speech_to_text()  # Call the function from main.py
+    query = main.speech_to_text()  # Call the function from main.py
     return jsonify({'text': query})  # Return the transcribed text as a JSON response
