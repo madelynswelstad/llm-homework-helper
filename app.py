@@ -21,7 +21,7 @@ os.makedirs(app.config['UPLOAD_FOLDER'], exist_ok=True)
 
 # Dictionary to store class titles as keys and lists of file paths as values
 class_files = {}
-queries = []
+conversation_list = []
 
 # home method is called when user loads root url, reloads page, or submits a form or performs an action
 @app.route('/', methods=['GET', 'POST']) # define a route to the homepage (ie the root url) and call function below
@@ -31,7 +31,7 @@ def home():
     if request.method == 'POST':
         query = request.form.get('query')
         response = main.process_query(query)
-        queries.append({"query": query, "response": response})  # Save query and response 
+        conversation_list.insert(0, [query, response])  # Save query and response 
 
     # check if collection already exists
     
@@ -56,7 +56,7 @@ def home():
     #             print(e)
     #             response = f"Error communicating with ChatGPT: {str(e)}"
     print(response)
-    return render_template('index.html', query=query, response=response, queries=[q['query'] for q in queries])  # pass queries for display
+    return render_template('index.html', conversation_list=conversation_list)  # pass queries for display
 
 @app.route('/upload', methods=['GET', 'POST'])  # define a route for the upload page
 def upload():

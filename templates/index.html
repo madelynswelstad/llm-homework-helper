@@ -18,15 +18,25 @@
         <button type="submit">Submit</button>
     </form>
 
+    {% if conversation_list and conversation_list|length > 0 %}
+        <ul>
+            <li>You asked: {{ conversation_list[0][0] }}</li>
+            <li>Response: {{ conversation_list[0][1] }}</li>
+        </ul>
+    {% else %}
+        <p>No queries yet. Start by entering one above!</p>
+    {% endif %}
+
     <h2>Speech to Text</h2>
     <button id="sttButton">Start Listening</button>
     <p id="sttResult">Your transcribed speech will appear here...</p>
 
-    {% if queries and queries|length > 0 %}
-        <h2>Previous Queries</h2>
+    {% if conversation_list and conversation_list|length > 0 %}
+        <h2>Conversation History</h2>
         <ul>
-            {% for q in queries %}
-                <li>{{ q }}</li>
+            {% for q, r in conversation_list %}
+                <li>Query: {{ q }}</li>
+                <li>Response: {{ r }}</li>
             {% endfor %}
         </ul>
     {% else %}
