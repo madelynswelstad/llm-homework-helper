@@ -6,6 +6,7 @@ from qdrant_client.models import VectorParams, Distance, PointStruct
 from dotenv import load_dotenv, find_dotenv
 import speech_recognition as sr
 import pyttsx3
+import openai
 
 # Load environment variables
 _ = load_dotenv(find_dotenv())
@@ -22,7 +23,7 @@ qdrant_client = QdrantClient(
 )
 
 # Define collection parameters
-collection_name = 'llm_training_data'
+collection_name = 'llm-collection2.0'
 vector_size = 1536  # Matches OpenAI's text-embedding-ada-002
 distance_metric = Distance.COSINE
 
@@ -53,6 +54,7 @@ def get_embedding(text):
         input=text,
         model="text-embedding-ada-002"
     )
+    # Access the embedding data properly
     return response.data[0].embedding
 
 def insert_documents(documents, collection_name):
@@ -103,11 +105,11 @@ def process_query(input_data):
 
     def get_completion(prompt, model="gpt-3.5-turbo"):
         messages = [{"role": "user", "content": prompt}]
-        response = openai_client.chat.completion.create(
+        response = openai.chat.completions.create(
             model=model,
             messages=messages
-        )
-        return response.choices[0].message.content
+        ).choices[0].message.content
+        return response
 
     prompt = f"""
         You need to format {query_answer} so that a human reader can understand it. Please answer in English.

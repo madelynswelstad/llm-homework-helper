@@ -26,28 +26,36 @@ queries = []
 # home method is called when user loads root url, reloads page, or submits a form or performs an action
 @app.route('/', methods=['GET', 'POST']) # define a route to the homepage (ie the root url) and call function below
 def home():
+    query = None
+    response = None
+    if request.method == 'POST':
+        query = request.form.get('query')
+        response = main.process_query(query)
+        queries.append({"query": query, "response": response})  # Save query and response 
+
     # check if collection already exists
-    main.find_collections(collection_name)
+    
+    # main.find_collections(collection_name)
 
-    query = None  # initialize query variable
-    response = None  # initialize response variable for ChatGPT
-    if request.method == 'POST':  # check if the request method is POST (when data like forms or actions are sent to the server)
-        query = request.form.get('query')  # retrieve the 'query' from the form data
+    # query = None  # initialize query variable
+    # response = None  # initialize response variable for ChatGPT
+    # if request.method == 'POST':  # check if the request method is POST (when data like forms or actions are sent to the server)
+    #     query = request.form.get('query')  # retrieve the 'query' from the form data
 
-        if query:  # If a query is provided
-            print(query)
-            # Send the query to ChatGPT
-            try:
-                response = openai.chat.completions.create(
-                    model="gpt-3.5-turbo",
-                    messages=[{"role": "user", "content": "Your query here"}]
-                ).choices[0].message.content
-                queries.append({"query": query, "response": response})  # Save query and response
-                print(response)
-            except Exception as e:
-                print(e)
-                response = f"Error communicating with ChatGPT: {str(e)}"
-
+    #     if query:  # If a query is provided
+    #         print(query)
+    #         Send the query to ChatGPT
+    #         try:
+    #             response = openai.chat.completions.create(
+    #                 model="gpt-3.5-turbo",
+    #                 messages=[{"role": "user", "content": "Your query here"}]
+    #             ).choices[0].message.content
+    #             queries.append({"query": query, "response": response})  # Save query and response
+    #             print(response)
+    #         except Exception as e:
+    #             print(e)
+    #             response = f"Error communicating with ChatGPT: {str(e)}"
+    print(response)
     return render_template('index.html', query=query, response=response, queries=[q['query'] for q in queries])  # pass queries for display
 
 @app.route('/upload', methods=['GET', 'POST'])  # define a route for the upload page
