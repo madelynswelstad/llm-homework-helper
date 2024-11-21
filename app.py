@@ -1,6 +1,7 @@
 from flask import Flask, render_template, request, redirect, url_for, send_from_directory
 import os
 import main
+import openai
 
 # create a flask application instance
 app = Flask(__name__)
@@ -9,11 +10,15 @@ app.config['UPLOAD_FOLDER'] = 'uploads/'  # Directory where uploaded files are s
 collection_name = "llm-collection2.0"
 currId = 0
 
+#OpenAI key
+openai.api_key = os.environ["OPENAI_API_KEY"]
+
 # Ensure the upload folder exists
 os.makedirs(app.config['UPLOAD_FOLDER'], exist_ok=True)
 
 # Dictionary to store class titles as keys and lists of file paths as values
 class_files = {}
+queries = []
 
 # home method is called when user loads root url, reloads page, or submits a form or performs an action
 @app.route('/', methods=['GET', 'POST']) # define a route to the homepage (ie the root url) and call function below
@@ -22,9 +27,22 @@ def home():
     main.find_collections(collection_name)
 
     query = None  # initialize query variable
+    response = None  # initialize response variable for ChatGPT
     if request.method == 'POST':  # check if the request method is POST (when data like forms or actions are sent to the server)
         query = request.form.get('query')  # retrieve the 'query' from the form data
-    return render_template('index.html', query=query)  # pass the query to the template to display
+
+        if query:  # If a query is provided
+            # Send the query to ChatGPT
+            try:
+                response = openai.chat.completion.create(
+                    model="gpt-3.5-turbo",
+                    messages=[{"role": "user", "content": "Your query here"}]
+                )["choices"][0]["message"]["content"]
+                queries.append({"query": query, "response": response})  # Save query and response
+            except Exception as e:
+                response = f"Error communicating with ChatGPT: {str(e)}"
+
+    return render_template('index.html', query=query, response=response, queries=[q['query'] for q in queries])  # pass queries for display
 
 @app.route('/upload', methods=['GET', 'POST'])  # define a route for the upload page
 def upload():
