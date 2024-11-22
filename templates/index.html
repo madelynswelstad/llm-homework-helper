@@ -6,13 +6,13 @@
     <title>Homework Helper</title>
 </head>
 <body>
-    <h1>Welcome to Madelyn's Freaking Web Application!</h1>
+    <h1>The Homework Helper</h1>
 
     <button onclick="window.location.href='/upload'">Upload Files</button>
 
-    <p>Madelyn might be the bestest?!?!?!?!</p>
+    <p>Upload any course material that can help me provide focused assistance!</p>
 
-    <h2>Enter a Query</h2>
+    <h2>Type your query</h2>
     <form method="POST" action="/">
         <input type="text" name="query" placeholder="Grant says to add your query">
         <button type="submit">Submit</button>
@@ -27,7 +27,7 @@
         <p>No queries yet. Start by entering one above!</p>
     {% endif %}
 
-    <h2>Speech to Text</h2>
+    <h2>Speak your query</h2>
     <button id="sttButton">Start Listening</button>
     <p id="sttResult">Your transcribed speech will appear here...</p>
 
