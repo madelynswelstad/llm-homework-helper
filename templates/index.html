@@ -13,9 +13,12 @@
     <p>Upload any course material that can help me provide focused assistance!</p>
 
     <h2>Type your query</h2>
-    <form method="POST" action="/">
-        <input type="text" name="query" placeholder="Grant says to add your query">
+    <form method="POST" action="/" style="display: flex; align-items: center; gap: 10px;">
+        <input type="text" name="query" placeholder="Ask questions here" style="width: 300px;">
         <button type="submit">Submit</button>
+        <button id="sttButton" type="button" title="Start Listening" style="display: flex; align-items: center;">
+            🎤
+        </button>
     </form>
 
     {% if conversation_list and conversation_list|length > 0 %}
@@ -27,9 +30,8 @@
         <p>No queries yet. Start by entering one above!</p>
     {% endif %}
 
-    <h2>Speak your query</h2>
-    <button id="sttButton">Start Listening</button>
-    <p id="sttResult">Your transcribed speech will appear here...</p>
+    <h2>Text-to-Speech</h2>
+    <button id="ttsButton">🔊 Read Most Recent Response</button>
 
     {% if conversation_list and conversation_list|length > 0 %}
         <h2>Conversation History</h2>
@@ -49,13 +51,64 @@
             fetch('/speech-to-text')
                 .then(response => response.json())
                 .then(data => {
-                    document.getElementById('sttResult').innerText = 'You said: ' + data.text;
+                    // Find the input field and set its value to the transcribed text
+                    const queryInput = document.querySelector('input[name="query"]');
+                    if (queryInput) {
+                        queryInput.value = data.text;
+                    }
                 })
                 .catch(error => {
                     console.error('Error:', error);
                     document.getElementById('sttResult').innerText = 'Error occurred. Try again.';
                 });
         });
+    </script>
+
+    <script>
+        document.getElementById('ttsButton').addEventListener('click', function () {
+        const mostRecentResponse = "{{ conversation_list[0][1] if conversation_list and conversation_list|length > 0 else '' }}";
+
+        if (mostRecentResponse) {
+            // Split text into chunks of 200 characters
+            const chunks = mostRecentResponse.match(/.{1,200}(\s|$)/g);
+
+            if (chunks) {
+            let chunkIndex = 0;
+
+            const speakChunk = () => {
+                // Ensure that we don't queue multiple speeches
+                if (speechSynthesis.speaking) {
+                    setTimeout(speakChunk, 100); // Wait and try again
+                    return;
+                }
+
+                if (chunkIndex < chunks.length) {
+                    // Replace potential malformed apostrophes
+                    const sanitizedText = chunks[chunkIndex]
+                        .replace(/&apos;/g, "'")  // Replace `&apos;` with `'` (apostrophe)
+                        .replace(/&#39;/g, "'")   // Handle other potential entities (like `&#39;`)
+                        .replace(/&quot;/g, '"'); // Optionally replace `&quot;` with `"`
+
+                    const utterance = new SpeechSynthesisUtterance(sanitizedText);
+                    utterance.lang = 'en-US'; // Set language
+                    utterance.onend = () => {
+                        chunkIndex++; // Move to the next chunk
+                        speakChunk(); // Speak the next chunk
+                    };
+                    utterance.onerror = (e) => {
+                        console.error('SpeechSynthesisUtterance error:', e);
+                    };
+                    speechSynthesis.speak(utterance); // Speak the current chunk
+                }
+            };
+
+            speakChunk(); // Start the speaking process
+        }
+        } else {
+            alert("No query available to read!");
+        }
+    });
+
     </script>
 
 </body>

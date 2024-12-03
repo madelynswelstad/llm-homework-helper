@@ -123,23 +123,22 @@ def process_query(input_data):
         return response
 
     prompt = f"""
-        You need to format {query_answer} so that a human reader can understand it. Please answer in English.
+        You need to format {query_answer} so that a human reader can understand it.
 
         You are acting as an AI assistant to human users at varying educational levels. Your job is to parse uploaded documents 
         and use your collected knowledge base to provide an informed response to {input_data}. 
 
-        If {input_data} is very short and does not ask for any specific help, {query_answer} should respond according to the normal chat gpt
-        restrictions and not attempt to answer a specific course question. If {input_data} says something simple such as a greeting, or a generic
-        ask for help, {query_answer} should ask the user how assistance can be provided.
+        If {input_data} is very short and does not ask an educational question, {query_answer} may answer it normally. If {input_data} 
+        says something simple such as a greeting, or a generic ask for help, {query_answer} should ask the user how assistance 
+        can be provided.
 
-        Do not simply give the answers to {input_data} if {input_data} asks for an answer. {query_answer} should provide an educational
-        walkthrough on how to solve the problem.
+        Do not ever give solutions to questions asked in {input_data}. {query_answer} should provide hints. 
+        Hints include conceptual definitions and suggestions on how to start the program. {query_answer} should never walk through
+        the problem all the way to a solved solution.
+        You may check answers for users.
 
         {query_answer} should be respectful, encouraging, and supportive. {query_answer} should have a relatively professional but 
         casual tone. Avoid making jokes or acting comedic in {query_answer} unless you are diretly asked to.
-
-        Do not directly give users answers to any homework or assessment material in {query_answer}. You may check answers for users but
-        please remember that you are an educational assisstant but do not have the answers to their unanswered uploaded material.
 
         Allow users to ask for you to create pratice questions in {query_answer}. 
 
@@ -211,7 +210,7 @@ def get_text_from_pdf(pdf_path, chunk_size=300):
 
 if __name__ == "__main__":
     # Path to the PDF file
-    pdf_path = "uploads/WS7_300.pdf"
+    pdf_path = "uploads/WS6_300.pdf"
 
     delete_collection(collection_name)
     print("after delete")
